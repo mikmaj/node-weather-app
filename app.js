@@ -25,7 +25,16 @@ request({
     json: true
 }, (error, response, body) => {
     // Print the address, latitude and longitude from the body
-    console.log(`Address: ${body.results[0].formatted_address}`)
-    console.log(`Latitude: ${body.results[0].geometry.location.lat}`)
-    console.log(`Longitude: ${body.results[0].geometry.location.lng}`)
+    if (error) {
+        console.log('Unable to connect to Google servers.')
+    } else if (body.status === "ZERO_RESULTS") {
+        console.log('Invalid address.')
+    } else if (body.status === "OK") {
+        console.log(`Address: ${body.results[0].formatted_address}`)
+        console.log(`Latitude: ${body.results[0].geometry.location.lat}`)
+        console.log(`Longitude: ${body.results[0].geometry.location.lng}`)
+    } else {
+        console.log('Unknown error')
+    }
+
 })
