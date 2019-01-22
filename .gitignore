@@ -1,3 +1,6 @@
 playground/
 .env
 node_modules/
+geocode/
+weather/
+app-callbacks.js
