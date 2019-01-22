@@ -1,48 +1,41 @@
-// require('dotenv').config()
-// const yargs = require('yargs')
-
-// const geocode = require('./geocode/geocode')
-
-// // Get the api key from the .env file
-// const API_KEY = process.env.API_KEY
-
-// const argv = yargs
-//     .options({
-//         a: {
-//             demand: true,
-//             alias: 'address',
-//             describe: 'Address to fetch weather for',
-//             string: true
-//         }
-//     })
-//     .help()
-//     .alias('help', 'h')
-//     .argv
-
-// geocode.geocodeAddress(argv.address, API_KEY, (errorMessage, results) => {
-//     if (errorMessage) {
-//         console.log(errorMessage);
-//     } else {
-//         console.log(JSON.stringify(results, undefined, 4))
-//     }
-// })
 require('dotenv').config()
-const request = require('request')
+const yargs = require('yargs')
 
-const API_KEY_NEW = process.env.API_KEY_NEW
+const geocode = require('./geocode/geocode')
+const weather = require('./weather/weather')
 
-request({
-    url: `https://api.darksky.net/forecast/${API_KEY_NEW}/61.4452417,23.8341589?units=si`,
-    json: true
-}, (error, response, body) => {
-    if (error) {
-        console.log("Unable to connect to Forecast.io servers")
-    } else if (response.statusCode === 400) {
-        console.log("Api key, address or URL is invalid.")
-    } else if (!error && response.statusCode === 200) {
-        console.log(body.currently.temperature)
+// Get the api keys from the .env file
+const LOCATION_API_KEY = process.env.LOCATION_API_KEY
+const WEATHER_API_KEY = process.env.WEATHER_API_KEY
+
+const argv = yargs
+    .options({
+        a: {
+            demand: true,
+            alias: 'address',
+            describe: 'Address to fetch weather for',
+            string: true
+        }
+    })
+    .help()
+    .alias('help', 'h')
+    .argv
+
+geocode.geocodeAddress(argv.address, LOCATION_API_KEY, (errorMessage, results) => {
+    if (errorMessage) {
+        console.log(errorMessage);
     } else {
-        console.log('Unable to fetch weather.')
+        console.log(results.address)
+        // Send the api key, location information and callbacks to weather.js
+        weather.getWeather(WEATHER_API_KEY, results.latitude, results.longitude, (errorMessage, weatherResults) => {
+            if (errorMessage) {
+                console.log(errorMessage)
+            } else {
+                console.log(`It's currently ${weatherResults.temperature}. It feels like ${weatherResults.apparentTemp}.`)
+            }
+        })
     }
-
 })
+
+
+
